@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service Defination for Partner'
+define service YDMO_PARTNER_SD {
+  expose YDMO_PARTNER_C as PartnerSDC;
+}

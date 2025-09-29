@@ -1,0 +1,29 @@
+managed implementation in class zbp_dmo_partner_i unique;
+strict ( 2 );
+
+define behavior for YDMO_PARTNER_I alias PartnerBDI
+persistent table ydmo_partner_db
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+  field ( readonly : update ) PartnerNumber;
+
+  mapping for ydmo_partner_db
+    {
+      PartnerNumber      = partner;
+      PartnerName        = name;
+      Street             = street;
+      City               = city;
+      Country            = country;
+      PaymentCurrency    = payment_currency;
+      ChangedAt          = changed_at;
+      ChangedBy          = changed_by;
+      CreatedAt          = created_at;
+      CreatedBy          = created_by;
+      LocalLastChangedAt = local_last_changed_at;
+    }
+}
