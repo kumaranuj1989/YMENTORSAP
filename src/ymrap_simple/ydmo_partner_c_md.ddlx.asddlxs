@@ -1,16 +1,21 @@
 @Metadata.layer: #CUSTOMER
+@Search.searchable: true
 annotate entity YDMO_PARTNER_C
     with 
 {
     @UI:{ facet: [{ id: 'Partner', position: 10, label: 'Partner', purpose: #STANDARD, type: #IDENTIFICATION_REFERENCE  }] }
     
     @UI:{ lineItem: [{ position: 10, label: 'Partner Number' }],
-          identification: [{ position: 10, label: 'Partner Number' }] 
+          identification: [{ position: 10, label: 'Partner Number' }],
+          selectionField : [ { position: 10 } ] 
         }
+    @Search.defaultSearchElement: true
     PartnerNumber;
     @UI:{ lineItem: [{ position: 20, label: 'Partner Name' }],
-          identification: [{ position: 20, label: 'Partner Name' }] 
+          identification: [{ position: 20, label: 'Partner Name' }],
+          selectionField : [ { position: 20 } ]  
         }
+    @Search.defaultSearchElement: true
     PartnerName;
     @UI:{ lineItem: [{ position: 30, label: 'Street' }],
           identification: [{ position: 30, label: 'Street' }] 
@@ -28,25 +33,15 @@ annotate entity YDMO_PARTNER_C
           identification: [{ position: 60, label: 'Payment Currency' }] 
         }
     PaymentCurrency;
-    @UI:{ lineItem: [{ position: 70, label: 'Created At' }],
-          identification: [{ position: 70, label: 'Created At' }] 
-        }
+    @UI:{ lineItem: [{ position: 70, label: 'Created At' }] }
     CreatedAt;
-    @UI:{ lineItem: [{ position: 80, label: 'Created By' }],
-          identification: [{ position: 80, label: 'Created By' }] 
-        }
+    @UI:{ lineItem: [{ position: 80, label: 'Created By' }] }
     CreatedBy;
-    @UI:{ lineItem: [{ position: 90, label: 'Changed At' }],
-          identification: [{ position: 90, label: 'Changed At' }] 
-        }
+    @UI:{ lineItem: [{ position: 90, label: 'Changed At' }] }
     ChangedAt;
-    @UI:{ lineItem: [{ position: 100, label: 'Changed By' }],
-          identification: [{ position: 100, label: 'Changed By' }] 
-        }
+    @UI:{ lineItem: [{ position: 100, label: 'Changed By' }] }
     ChangedBy;
-    @UI:{ lineItem: [{ position: 110, label: 'Last Changed At' }],
-          identification: [{ position: 110, label: 'Last Changed At' }] 
-        }
+    @UI:{ lineItem: [{ position: 110, label: 'Last Changed At' }] }
     LocalLastChangedAt;
     
 }
