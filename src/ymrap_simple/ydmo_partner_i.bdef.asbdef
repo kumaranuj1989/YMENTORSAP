@@ -11,6 +11,12 @@ authorization master ( instance )
   update;
   delete;
   field ( readonly : update ) PartnerNumber;
+//Validations belong to the behavioral definition of a business object and are defined at the corresponding entity,
+//where they should also apply. They are triggered when the data is saved and can be registered for the individual
+//events such as create, update and delete.
+//Furthermore, there is also the possibility that a validation is only triggered when a single field is changed
+  validation validateCoreData on save { field Country, PaymentCurrency; }
+  validation validateKeyIsFilled on save { create; }
 
   mapping for ydmo_partner_db
     {
