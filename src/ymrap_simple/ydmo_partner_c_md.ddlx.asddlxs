@@ -3,34 +3,51 @@
 annotate entity YDMO_PARTNER_C
     with 
 {
-    @UI:{ facet: [{ id: 'Partner', position: 10, label: 'Partner', purpose: #STANDARD, type: #IDENTIFICATION_REFERENCE  }] }
+
+//  Facet : used to align the fields in separate goups
+//  targetQualifer : used as a reference id for getting the element assigned under it
+//  parentid : used as reference id to get the different facet assigned under another facet
+    @UI:{ facet: [{ id: 'Partner', position: 10, label: 'Partner Info',    purpose: #STANDARD, type: #IDENTIFICATION_REFERENCE, targetQualifier: 'PARTNER_INFO', parentId: 'Collect'  },
+                  { id: 'Address', position: 20, label: 'Partner Address', purpose: #STANDARD, type: #IDENTIFICATION_REFERENCE, targetQualifier: 'PARTNER_ADDR', parentId: 'Collect'  },
+                  { id: 'Collect', position: 10, label: 'Info & Address',  purpose: #STANDARD, type: #COLLECTION }] }
     
-    @UI:{ lineItem: [{ position: 10, label: 'Partner Number' }],
-          identification: [{ position: 10, label: 'Partner Number' }],
+    
+//  LineItem : used to display the position, label in the table display
+//  identificton : used to display the position, label in the object page
+//  Selection field : used to display the field as selection/filter field  
+//  Searchable : used to display the field for filter criteria   
+//  Importance : used to display the field visible if the browser size is decreased
+//  Qualifier : used to group the element under the defined qualifer
+    @UI:{ lineItem: [{ position: 10, label: 'Partner Number', importance: #HIGH }],
+          identification: [{ position: 10, label: 'Partner Number', qualifier: 'PARTNER_INFO' }],
           selectionField : [ { position: 10 } ] 
         }
     @Search.defaultSearchElement: true
+    @EndUserText.label: 'Partner No'
+    @EndUserText.quickInfo: 'Partner Number'
     PartnerNumber;
     @UI:{ lineItem: [{ position: 20, label: 'Partner Name' }],
-          identification: [{ position: 20, label: 'Partner Name' }],
+          identification: [{ position: 20, label: 'Partner Name', qualifier: 'PARTNER_INFO' }],
           selectionField : [ { position: 20 } ]  
         }
     @Search.defaultSearchElement: true
+    @EndUserText.label: 'Name'
+    @EndUserText.quickInfo: 'Partner Name'
     PartnerName;
     @UI:{ lineItem: [{ position: 30, label: 'Street' }],
-          identification: [{ position: 30, label: 'Street' }] 
+          identification: [{ position: 30, label: 'Street', qualifier: 'PARTNER_ADDR' }] 
         }
     Street;
     @UI:{ lineItem: [{ position: 40, label: 'City' }],
-          identification: [{ position: 40, label: 'City' }] 
+          identification: [{ position: 40, label: 'City', qualifier: 'PARTNER_ADDR' }] 
         }
     City;
     @UI:{ lineItem: [{ position: 50, label: 'Country' }],
-          identification: [{ position: 50, label: 'Country' }] 
+          identification: [{ position: 50, label: 'Country', qualifier: 'PARTNER_ADDR' }] 
         }
     Country;
     @UI:{ lineItem: [{ position: 60, label: 'Payment Currency' }],
-          identification: [{ position: 60, label: 'Payment Currency' }] 
+          identification: [{ position: 60, label: 'Payment Currency', qualifier: 'PARTNER_INFO' }] 
         }
     PaymentCurrency;
     @UI:{ lineItem: [{ position: 70, label: 'Created At' }] }
