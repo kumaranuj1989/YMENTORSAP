@@ -19,15 +19,18 @@ annotate entity YDMO_PARTNER_C
 //  Searchable : used to display the field for filter criteria   
 //  Importance : used to display the field visible if the browser size is decreased
 //  Qualifier : used to group the element under the defined qualifer
-    @UI:{ lineItem: [{ position: 10, label: 'Partner Number', importance: #HIGH }],
-          identification: [{ position: 10, label: 'Partner Number', qualifier: 'PARTNER_INFO' }],
+    @UI:{ lineItem: [{ position: 10, label: 'Partner Number', importance: #HIGH },
+                     { position: 10, label: 'Fill Street', type: #FOR_ACTION, dataAction: 'fillEmptyStreets' } ],  // any field can be extended for action to be displayed
+          identification: [{ position: 10, label: 'Partner Number', qualifier: 'PARTNER_INFO' },
+                           { position: 10, label: 'Fill Street', type: #FOR_ACTION, dataAction: 'fillEmptyStreets' }],                  // to show at object page, we need to extend action here as well
           selectionField : [ { position: 10 } ] 
         }
     @Search.defaultSearchElement: true
     @EndUserText.label: 'Partner No'
     @EndUserText.quickInfo: 'Partner Number'
     PartnerNumber;
-    @UI:{ lineItem: [{ position: 20, label: 'Partner Name' }],
+    @UI:{ lineItem: [{ position: 20, label: 'Partner Name' },
+                     { position: 20, label: 'Clear All Street', type: #FOR_ACTION, dataAction: 'clearAllEmptyStreets' }],  // any field can be extended with further annotations
           identification: [{ position: 20, label: 'Partner Name', qualifier: 'PARTNER_INFO' }],
           selectionField : [ { position: 20 } ]  
         }

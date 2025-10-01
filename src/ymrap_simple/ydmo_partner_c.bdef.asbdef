@@ -6,4 +6,8 @@ define behavior for YDMO_PARTNER_C alias PartnerBDC
   use create;
   use update;
   use delete;
+
+  use action fillEmptyStreets;
+  use action clearAllEmptyStreets;
+
 }
