@@ -22,6 +22,9 @@ CLASS lhc_PartnerBDI DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS fillEmptyStreets FOR MODIFY
       IMPORTING keys FOR ACTION PartnerBDI~fillEmptyStreets RESULT result.
 
+    METHODS copyLine FOR MODIFY
+      IMPORTING keys FOR ACTION PartnerBDI~copyLine.
+
 ENDCLASS.
 
 CLASS lhc_PartnerBDI IMPLEMENTATION.
@@ -106,14 +109,14 @@ CLASS lhc_PartnerBDI IMPLEMENTATION.
 
 
     LOOP AT lt_table ASSIGNING FIELD-SYMBOL(<lfs_table>).
-     MODIFY ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
-     UPDATE FIELDS ( Street )
-     WITH VALUE #( ( %tky-PartnerNumber = <lfs_table>-partner
-                                 Street = space
-                        %control-Street = if_abap_behv=>mk-on )  )
-     FAILED DATA(lt_failed)
-     MAPPED DATA(lt_mapped)
-     REPORTED DATA(lt_reported).
+      MODIFY ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
+      UPDATE FIELDS ( Street )
+      WITH VALUE #( ( %tky-PartnerNumber = <lfs_table>-partner
+                                  Street = space
+                         %control-Street = if_abap_behv=>mk-on )  )
+      FAILED DATA(lt_failed)
+      MAPPED DATA(lt_mapped)
+      REPORTED DATA(lt_reported).
     ENDLOOP.
 
     DATA : lt_update TYPE TABLE FOR UPDATE ydmo_partner_i.
@@ -121,40 +124,76 @@ CLASS lhc_PartnerBDI IMPLEMENTATION.
 
     MODIFY ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
      UPDATE FIELDS ( Street )
-     WITH value #( for ls_update in lt_update ( %tky-PartnerNumber = ls_update-PartnerNumber
+     WITH VALUE #( FOR ls_update IN lt_update ( %tky-PartnerNumber = ls_update-PartnerNumber
                                  Street = space
                         %control-Street = if_abap_behv=>mk-on ) ).
 
-    INSERT value #( %msg     = new_message_with_text( text = |{ lines( lt_table ) } records changed|
+    INSERT VALUE #( %msg     = new_message_with_text( text = |{ lines( lt_table ) } records changed|
                     severity = if_abap_behv_message=>severity-success  ) )
-     into table reported-partnerbdi.
+     INTO TABLE reported-partnerbdi.
   ENDMETHOD.
 
   METHOD fillEmptyStreets.
-  READ ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
-  FIELDS ( Street )
-  WITH VALUE #( ( %tky-PartnerNumber = keys[ 1 ]-PartnerNumber ) )
-  RESULT data(lt_result).
+    READ ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
+    FIELDS ( Street )
+    WITH VALUE #( ( %tky-PartnerNumber = keys[ 1 ]-PartnerNumber ) )
+    RESULT DATA(lt_result).
 
-  READ ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
-  FIELDS ( Street )
-  with CORRESPONDING #( keys )
-  RESULT lt_result.
+    READ ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
+    FIELDS ( Street )
+    WITH CORRESPONDING #( keys )
+    RESULT lt_result.
 
-  READ ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
-  ALL FIELDS WITH corresponding #( keys )
-  result data(lt_result1).
+    READ ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
+    ALL FIELDS WITH CORRESPONDING #( keys )
+    RESULT DATA(lt_result1).
 
-  MODIFY ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
-  UPDATE FIELDS ( Street )
-  with value #( ( %tky-PartnerNumber = lt_result[ 1 ]-PartnerNumber Street = 'EMPTY' %control-Street = if_abap_behv=>mk-on ) )
-  MAPPED mapped.
+    MODIFY ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
+    UPDATE FIELDS ( Street )
+    WITH VALUE #( ( %tky-PartnerNumber = lt_result[ 1 ]-PartnerNumber Street = 'EMPTY' %control-Street = if_abap_behv=>mk-on ) )
+    MAPPED mapped.
 
-  INSERT value #( %msg     = new_message_with_text( text = |{ keys[ 1 ]-PartnerNumber } records changed|
-                  severity = if_abap_behv_message=>severity-success  ) )
-     into table reported-partnerbdi.
+    INSERT VALUE #( %msg     = new_message_with_text( text = |{ keys[ 1 ]-PartnerNumber } records changed|
+                    severity = if_abap_behv_message=>severity-success  ) )
+       INTO TABLE reported-partnerbdi.
 
-  insert value #( %tky = lt_result[ 1 ]-%tky %param = lt_result[ 1 ] ) into table result.
+    "Insert key field and the whole structure of that particular records
+    INSERT VALUE #( %tky = lt_result[ 1 ]-%tky %param = lt_result[ 1 ] ) INTO TABLE result.
+  ENDMETHOD.
+
+  METHOD copyLine.
+    DATA : lt_creation  TYPE TABLE FOR CREATE      ydmo_partner_i.
+
+    READ ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
+    ALL FIELDS WITH CORRESPONDING #( keys )
+    RESULT DATA(lt_result).
+
+    SELECT FROM ydmo_partner_db
+    FIELDS MAX( partner )
+    INTO @DATA(lv_partner).
+
+    LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<lfs_result>).
+       lv_partner = lv_partner + 1.
+      <lfs_result>-PartnerNumber = lv_partner.
+      <lfs_result>-PartnerName &&= |Copy|.
+
+      INSERT VALUE #( %cid = keys[ sy-tabix ]-%cid ) INTO TABLE lt_creation REFERENCE INTO DATA(lr_create).
+      lr_create->* = CORRESPONDING #( <lfs_result> ).
+      lr_create->%control-PartnerNumber = if_abap_behv=>mk-on.
+      lr_create->%control-PartnerName   = if_abap_behv=>mk-on.
+      lr_create->%control-Street        = if_abap_behv=>mk-on.
+      lr_create->%control-City          = if_abap_behv=>mk-on.
+      lr_create->%control-Street        = if_abap_behv=>mk-on.
+      lr_create->%control-PaymentCurrency = if_abap_behv=>mk-on.
+    ENDLOOP.
+
+    MODIFY ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
+    CREATE FROM lt_creation
+    FAILED DATA(lt_failed)
+    MAPPED DATA(lt_mapped)
+    REPORTED DATA(lt_reported).
+
+    mapped-partnerbdi = lt_mapped-partnerbdi.
   ENDMETHOD.
 
 ENDCLASS.

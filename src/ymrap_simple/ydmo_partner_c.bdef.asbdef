@@ -9,5 +9,6 @@ define behavior for YDMO_PARTNER_C alias PartnerBDC
 
   use action fillEmptyStreets;
   use action clearAllEmptyStreets;
+  use action copyLine;
 
 }

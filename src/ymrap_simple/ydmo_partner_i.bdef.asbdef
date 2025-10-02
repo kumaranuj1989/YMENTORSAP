@@ -29,6 +29,9 @@ authorization master ( instance )
   //The action is correspondingly different, because here we have to read all the keys ourselves from the database and are not handed them over.
   static action clearAllEmptyStreets;
 
+  //method generates an instance of the current entity, which can happen when copying
+  factory action copyLine [1];
+
   mapping for ydmo_partner_db
     {
       PartnerNumber      = partner;

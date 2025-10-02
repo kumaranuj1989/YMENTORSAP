@@ -38,7 +38,8 @@ annotate entity YDMO_PARTNER_C
     @EndUserText.label: 'Name'
     @EndUserText.quickInfo: 'Partner Name'
     PartnerName;
-    @UI:{ lineItem: [{ position: 30, label: 'Street' }],
+    @UI:{ lineItem: [{ position: 30, label: 'Street' },
+                     { position: 30, label: 'Copy', type: #FOR_ACTION, dataAction: 'copyLine' }],
           identification: [{ position: 30, label: 'Street', qualifier: 'PARTNER_ADDR' }] 
         }
     Street;
