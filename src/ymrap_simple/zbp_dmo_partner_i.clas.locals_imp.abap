@@ -25,6 +25,9 @@ CLASS lhc_PartnerBDI DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS copyLine FOR MODIFY
       IMPORTING keys FOR ACTION PartnerBDI~copyLine.
 
+    METHODS withpopup FOR MODIFY
+      IMPORTING keys FOR ACTION PartnerBDI~withpopup.
+
 ENDCLASS.
 
 CLASS lhc_PartnerBDI IMPLEMENTATION.
@@ -173,10 +176,11 @@ CLASS lhc_PartnerBDI IMPLEMENTATION.
     INTO @DATA(lv_partner).
 
     LOOP AT lt_result ASSIGNING FIELD-SYMBOL(<lfs_result>).
-       lv_partner = lv_partner + 1.
+      lv_partner = lv_partner + 1.
       <lfs_result>-PartnerNumber = lv_partner.
       <lfs_result>-PartnerName &&= |Copy|.
 
+      DATA(lr_data_ref) = REF #( lt_creation ).
       INSERT VALUE #( %cid = keys[ sy-tabix ]-%cid ) INTO TABLE lt_creation REFERENCE INTO DATA(lr_create).
       lr_create->* = CORRESPONDING #( <lfs_result> ).
       lr_create->%control-PartnerNumber = if_abap_behv=>mk-on.
@@ -194,6 +198,11 @@ CLASS lhc_PartnerBDI IMPLEMENTATION.
     REPORTED DATA(lt_reported).
 
     mapped-partnerbdi = lt_mapped-partnerbdi.
+  ENDMETHOD.
+
+  METHOD withpopup.
+    IF 0 = 0.
+    ENDIF.
   ENDMETHOD.
 
 ENDCLASS.

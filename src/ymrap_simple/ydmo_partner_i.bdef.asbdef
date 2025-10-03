@@ -32,6 +32,9 @@ authorization master ( instance )
   //method generates an instance of the current entity, which can happen when copying
   factory action copyLine [1];
 
+  //Action for popup
+  static action withpopup parameter ydmo_popup;
+
   mapping for ydmo_partner_db
     {
       PartnerNumber      = partner;

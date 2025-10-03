@@ -43,17 +43,20 @@ annotate entity YDMO_PARTNER_C
           identification: [{ position: 30, label: 'Street', qualifier: 'PARTNER_ADDR' }] 
         }
     Street;
-    @UI:{ lineItem: [{ position: 40, label: 'City' }],
+    @UI:{ lineItem: [{ position: 40, label: 'City' },
+                     { position: 40, label: 'Pop Up', type: #FOR_ACTION, dataAction: 'withpopup' }],
           identification: [{ position: 40, label: 'City', qualifier: 'PARTNER_ADDR' }] 
         }
     City;
     @UI:{ lineItem: [{ position: 50, label: 'Country' }],
           identification: [{ position: 50, label: 'Country', qualifier: 'PARTNER_ADDR' }] 
         }
+    @Consumption.valueHelpDefinition: [{ entity: { name: 'ydmo_country_i_vh', element: 'Country' }  }]   //Custom CDS for F4 help for Country
     Country;
     @UI:{ lineItem: [{ position: 60, label: 'Payment Currency' }],
           identification: [{ position: 60, label: 'Payment Currency', qualifier: 'PARTNER_INFO' }] 
         }
+    @Consumption.valueHelpDefinition: [{ entity: { name: 'I_CurrencyStdVH', element: 'Currency' }  }]  //Standard CDS for F4 help for payment currency
     PaymentCurrency;
     @UI:{ lineItem: [{ position: 70, label: 'Created At' }] }
     CreatedAt;
