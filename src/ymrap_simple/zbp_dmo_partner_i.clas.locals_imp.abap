@@ -1,3 +1,26 @@
+CLASS lsc_ydmo_partner_i DEFINITION INHERITING FROM cl_abap_behavior_saver.
+
+  PROTECTED SECTION.
+
+    METHODS adjust_numbers REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_ydmo_partner_i IMPLEMENTATION.
+
+  METHOD adjust_numbers.
+    SELECT FROM ydmo_partner_db
+    FIELDS MAX( partner )
+    INTO @DATA(ld_max_partner).
+
+    LOOP AT mapped-partnerbdi REFERENCE INTO DATA(lr_partner).
+      ld_max_partner += 1.
+      lr_partner->PartnerNumber = ld_max_partner.
+    ENDLOOP.
+  ENDMETHOD.
+
+ENDCLASS.
+
 CLASS lhc_PartnerBDI DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
 
@@ -77,18 +100,18 @@ CLASS lhc_PartnerBDI IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD validateKeyIsFilled.
-    LOOP AT keys ASSIGNING FIELD-SYMBOL(<lfs_keys>) WHERE %tky-PartnerNumber IS INITIAL.
-      INSERT VALUE #( PartnerNumber = <lfs_keys>-PartnerNumber  ) INTO TABLE failed-partnerbdi.
-
-      "%state_area used to categorize the message, linking it to a specific validation or condition
-      "%element used to specify which field should be highlighted
-      "%msg used to provide the message for display along with severity
-      INSERT VALUE #( PartnerNumber          = <lfs_keys>-PartnerNumber
-                      %state_area            = 'Partner Info'
-                      %element-partnernumber = if_abap_behv=>mk-on
-                      %msg                   = new_message_with_text( severity = if_abap_behv_message=>severity-error
-                                                                 text = 'PartnerNumber is mandatory' ) ) INTO TABLE reported-partnerbdi.
-    ENDLOOP.
+*    LOOP AT keys ASSIGNING FIELD-SYMBOL(<lfs_keys>) WHERE %tky-PartnerNumber IS INITIAL.
+*      INSERT VALUE #( PartnerNumber = <lfs_keys>-PartnerNumber  ) INTO TABLE failed-partnerbdi.
+*
+*      "%state_area used to categorize the message, linking it to a specific validation or condition
+*      "%element used to specify which field should be highlighted
+*      "%msg used to provide the message for display along with severity
+*      INSERT VALUE #( PartnerNumber          = <lfs_keys>-PartnerNumber
+*                      %state_area            = 'Partner Info'
+*                      %element-partnernumber = if_abap_behv=>mk-on
+*                      %msg                   = new_message_with_text( severity = if_abap_behv_message=>severity-error
+*                                                                 text = 'PartnerNumber is mandatory' ) ) INTO TABLE reported-partnerbdi.
+*    ENDLOOP.
 
   ENDMETHOD.
 
@@ -201,8 +224,46 @@ CLASS lhc_PartnerBDI IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD withpopup.
-    IF 0 = 0.
-    ENDIF.
+    TRY.
+        DATA(ls_key) = keys[ 1 ].
+      CATCH cx_sy_itab_line_not_found.
+        RETURN.
+    ENDTRY.
+
+    CASE ls_key-%param-MessageType.
+      WHEN 1.
+        INSERT VALUE #(
+          %msg = new_message_with_text( severity = if_abap_behv_message=>severity-success text = 'Dummy message' )
+        ) INTO TABLE reported-partnerbdi.
+      WHEN 2.
+        INSERT VALUE #(
+          %msg = new_message_with_text( severity = if_abap_behv_message=>severity-information text = 'Dummy message' )
+        ) INTO TABLE reported-partnerbdi.
+      WHEN 3.
+        INSERT VALUE #(
+          %msg = new_message_with_text( severity = if_abap_behv_message=>severity-warning text = 'Dummy message' )
+        ) INTO TABLE reported-partnerbdi.
+      WHEN 4.
+        INSERT VALUE #(
+          %msg = new_message_with_text( severity = if_abap_behv_message=>severity-error text = 'Dummy message' )
+        ) INTO TABLE reported-partnerbdi.
+      WHEN 5.
+        INSERT VALUE #(
+          %msg = new_message_with_text( severity = if_abap_behv_message=>severity-none text = 'Dummy message' )
+        ) INTO TABLE reported-partnerbdi.
+      WHEN 6.
+        reported-partnerbdi = VALUE #(
+          ( %msg = new_message_with_text( severity = if_abap_behv_message=>severity-success text = 'Dummy message' ) )
+          ( %msg = new_message_with_text( severity = if_abap_behv_message=>severity-information text = 'Dummy message' ) )
+        ).
+      WHEN 7.
+        reported-partnerbdi = VALUE #(
+          ( %msg = new_message_with_text( severity = if_abap_behv_message=>severity-success text = 'Dummy message' ) )
+          ( %msg = new_message_with_text( severity = if_abap_behv_message=>severity-error text = 'Dummy message' ) )
+          ( %msg = new_message_with_text( severity = if_abap_behv_message=>severity-warning text = 'Dummy message' ) )
+          ( %msg = new_message_with_text( severity = if_abap_behv_message=>severity-information text = 'Dummy message' ) )
+        ).
+    ENDCASE.
   ENDMETHOD.
 
 ENDCLASS.

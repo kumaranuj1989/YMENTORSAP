@@ -5,17 +5,22 @@ define behavior for YDMO_PARTNER_I alias PartnerBDI
 persistent table ydmo_partner_db
 lock master
 authorization master ( instance )
+late numbering
 //etag master <field_name>
 {
   create ( authorization : global );
   update;
   delete;
-  field ( readonly : update ) PartnerNumber;
+  field ( readonly ) PartnerNumber;
   //Validations belong to the behavioral definition of a business object and are defined at the corresponding entity,
   //where they should also apply. They are triggered when the data is saved and can be registered for the individual
   //events such as create, update and delete.
   //Furthermore, there is also the possibility that a validation is only triggered when a single field is changed
   validation validateCoreData on save { create; field Country, PaymentCurrency; }
+
+  //we need to comment out the implementation of the validateKeyIsFilled method.
+  //The key is no longer assigned externally, but only in the storage sequence.
+  //Because validation is called before the sequence, validation would hinder the save operation.
   validation validateKeyIsFilled on save { create; }
 
   //A determination only has to be defined at the level of the interface, since it applies at all times and
