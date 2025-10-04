@@ -51,6 +51,12 @@ CLASS lhc_PartnerBDI DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS withpopup FOR MODIFY
       IMPORTING keys FOR ACTION PartnerBDI~withpopup.
 
+    METHODS get_instance_features FOR INSTANCE FEATURES
+      IMPORTING keys REQUEST requested_features FOR PartnerBDI RESULT result.
+
+    METHODS get_global_features FOR GLOBAL FEATURES
+      IMPORTING REQUEST requested_features FOR partnerbdi RESULT result.
+
 ENDCLASS.
 
 CLASS lhc_PartnerBDI IMPLEMENTATION.
@@ -264,6 +270,31 @@ CLASS lhc_PartnerBDI IMPLEMENTATION.
           ( %msg = new_message_with_text( severity = if_abap_behv_message=>severity-information text = 'Dummy message' ) )
         ).
     ENDCASE.
+  ENDMETHOD.
+
+  METHOD get_instance_features.
+    "KEYS - Transfer all instances to be checked. When the list loads for the first time, all records to be displayed are loaded.
+    "REQUESTED FEATURES - Structure where the features to be checked are marked. Is used for the different tests.
+    "RESULT - Result of the entities for which the feature should be deactivated
+    if requested_features-%action-fillEmptyStreets = if_abap_behv=>mk-on.
+     READ ENTITIES OF ydmo_partner_i IN LOCAL MODE ENTITY PartnerBDI
+     FIELDS ( Street )
+     with CORRESPONDING #( keys )
+     result data(lt_result).
+
+     "The features are all activated by default and must now be deactivated for the entities that do not match
+     loop at lt_result ASSIGNING FIELD-SYMBOL(<lfs_Result>) where Street is not INITIAL.
+     insert value #( partnernumber = <lfs_Result>-PartnerNumber %action-fillEmptyStreets = conv #( if_abap_behv=>mk-on ) ) INTO TABLE result.
+     ENDLOOP.
+    endif.
+  ENDMETHOD.
+
+  METHOD get_global_features.
+  if requested_features-%delete = if_abap_behv=>mk-on.
+  data(lv_deactivate) = cond #( when cl_abap_context_info=>get_user_alias( ) = 'ABCD' THEN if_abap_behv=>mk-off
+                                ELSE if_abap_behv=>mk-on ).
+  result-%delete = conv #( lv_deactivate ).
+  endif.
   ENDMETHOD.
 
 ENDCLASS.

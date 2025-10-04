@@ -1,6 +1,7 @@
 @Metadata.layer: #CUSTOMER
 @Search.searchable: true
-@UI:{ headerInfo:{ typeName: 'Partner', typeNamePlural: 'Partners' } }  //used to give table name and object page name
+@UI:{ headerInfo:{ typeName: 'Partner', typeNamePlural: 'Partners',          //used to give table name and object page name
+                   title:{ type: #STANDARD, value: 'PartnerName' } } }      //used to give Title and object page name
 annotate entity YDMO_PARTNER_C
     with 
 {

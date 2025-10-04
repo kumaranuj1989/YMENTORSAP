@@ -1,17 +1,30 @@
 managed implementation in class zbp_dmo_partner_i unique;
 strict ( 2 );
+with draft;
 
 define behavior for YDMO_PARTNER_I alias PartnerBDI
 persistent table ydmo_partner_db
-lock master
+draft table ydmo_dpartner_db
+lock master total etag ChangedAt
 authorization master ( instance )
 late numbering
-//etag master <field_name>
+etag master LocalLastChangedAt
 {
   create ( authorization : global );
   update;
-  delete;
+  delete ( features : global );
   field ( readonly ) PartnerNumber;
+
+  draft action Resume;
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+
+  draft determine action Prepare
+  {
+    validation validateKeyIsFilled;
+    validation validateCoreData;
+  }
   //Validations belong to the behavioral definition of a business object and are defined at the corresponding entity,
   //where they should also apply. They are triggered when the data is saved and can be registered for the individual
   //events such as create, update and delete.
@@ -29,18 +42,18 @@ late numbering
 
   //think of actions is as buttons on an interface, you can trigger them externally and they perform different steps.
   //The normal action is initially inactive and can only be used once one or more records in the list have been selected. The action is only performed on this record.
-  action fillEmptyStreets result [1] $self;
+  //Instance-based feature ("features:instance") - The data of the individual instance is available to you, it is decided per instance how the feature is handled.
+  action ( features : instance ) fillEmptyStreets result [1] $self;
   //The second action is always active because it affects the entire object and is not dependent on a selected data record.
   //The action is correspondingly different, because here we have to read all the keys ourselves from the database and are not handed them over.
   static action clearAllEmptyStreets;
+  //Action for popup
+  static action withpopup parameter ydmo_popup;
 
   //method generates an instance of the current entity, which can happen when copying
   factory action copyLine [1];
 
-  //Action for popup
-  static action withpopup parameter ydmo_popup;
-
-  mapping for ydmo_partner_db
+   mapping for ydmo_partner_db
     {
       PartnerNumber      = partner;
       PartnerName        = name;
